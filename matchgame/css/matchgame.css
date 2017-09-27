@@ -1,0 +1,48 @@
+body{
+    text-align: center;
+    background: #a46740 url(../../static/images/poker_sprite.png);
+}
+#game {
+    background: #232 url();
+    padding: 5px;
+}
+
+.card {
+    perspective: 500px;
+    width: 105px;
+    height: 150px
+}
+
+.face{
+    border-radius:10px;
+    width:100%;
+    height:100%;
+    position: absolute;
+    transition:all .3s;
+    backface-visibility: hidden;
+}
+.front{
+    background: #966;
+    z-index: 10;
+}
+.back{
+    background: #eaa;
+    transform: rotate3d(0,1,0,-180deg);
+    z-index: 8;
+}
+.card-flipped .front {
+    transform:rotate3d(0,1,0,180deg);
+    z-index: 8;
+}
+.card-flipped .back {
+    transform:rotate3d(0,1,0,0deg);
+    z-index: 10;
+}
+
+.cardAQ {
+    background: url("../../static/images/poker/12.jpg");
+}
+
+.cardAK {
+    background: url("../../static/images/poker/13.jpg");
+}

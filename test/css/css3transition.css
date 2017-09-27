@@ -1,0 +1,28 @@
+body {
+    background: #aaa;
+}
+
+.card {
+    width: 105px;
+    height: 150px;
+    margin: 20px;
+    background: #efefef;
+    position: absolute;
+    transition: all 1s linear;
+}
+
+.cardAQ {
+    background: url("../../static/images/poker/12.jpg");
+}
+
+.cardAK {
+    background: url("../../static/images/poker/13.jpg");
+}
+
+.rotateRight {
+    transform: rotate3d(0, 0, 1, 90deg);
+}
+
+.moveAndScale {
+    transform: translate3d(180px, 180px, 0) scale3d(1.5, 1.5, 1);
+}
