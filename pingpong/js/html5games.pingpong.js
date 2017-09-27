@@ -44,6 +44,12 @@ $(function () {
 });
 
 function gameLoop() {
+    if (pingpong.scoreA >= 10 || pingpong.scoreB >= 10) {
+        clearInterval(pingpong.timer);
+        pingpong.pressedKeys = [];
+        var msg = pingpong.scoreA >= 10 ? "playerA is win." : "playerA is win.";
+        alert(msg);
+    }
     moveBall();
     movePaddles();
 }
