@@ -12,6 +12,10 @@ matchingGame.deck = [
 ]
 ;
 $(function () {
+    startGame();
+});
+
+function startGame() {
     // 洗牌
     matchingGame.deck.sort(shuffle);
     for (var i = 0; i < 11; i++) {
@@ -32,7 +36,11 @@ $(function () {
         // 监听每张纸牌DIV元素的单击事件
         $(this).click(selectCard);
     });
-});
+}
+
+function stopGame() {
+    alert("You win.");
+}
 
 function shuffle() {
     return 0.5 - Math.random();
@@ -55,6 +63,7 @@ function checkPattern() {
     } else {
         $(".card-flipped").removeClass("card-flipped");
     }
+    setTimeout(checkGameOver, 700);
 }
 
 function isMatchPattern() {
@@ -67,4 +76,11 @@ function isMatchPattern() {
 
 function removeTookCards() {
     $(".card-removed").remove();
+}
+
+function checkGameOver() {
+    if ($("#cards").children().size() == 0) {
+        stopGame();
+        startGame();
+    }
 }
