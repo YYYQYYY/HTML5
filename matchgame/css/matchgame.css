@@ -1,48 +1,103 @@
-body{
+body {
     text-align: center;
-    background: #a46740 url(../../static/images/poker_sprite.png);
+    background: #a46740;/* url(../images/pixel_grid.jpg);*/
 }
+
 #game {
-    background: #232 url();
+    background: #232 url(../images/pixel_grid.jpg);
     padding: 5px;
+    border-radius: 10px;
+    border: 1px solid #666;
+    width: 432px;
+    height: 460px;
+    margin: 0 auto;
+    display: -webkit-box;
+    display: -moz-box;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+}
+
+#cards {
+    position: relative;
+    width: 432px;
+    height: 460px
 }
 
 .card {
-    perspective: 500px;
-    width: 105px;
-    height: 150px
+    perspective: 600px;
+    width: 93px;
+    height: 140px;
+    position: absolute;
+    transition: all .3s;
 }
 
-.face{
-    border-radius:10px;
-    width:100%;
-    height:100%;
+.face {
+    border-radius: 10px;
+    width: 100%;
+    height: 100%;
     position: absolute;
-    transition:all .3s;
+    transition-property: opacity, transform, box-shadow;
+    transition-duration: .3s;
     backface-visibility: hidden;
 }
-.front{
-    background: #966;
+
+.front {
+    background: #999 url(../../static/images/poker_sprite.png) -15px -625px;
     z-index: 10;
 }
-.back{
-    background: #eaa;
-    transform: rotate3d(0,1,0,-180deg);
+
+.back {
+    background: #efefef url(../../static/images/poker_sprite.png);
+    transform: rotate3d(0, 1, 0, -180deg);
     z-index: 8;
 }
+
+.card:hover .face, .card-flipped .face {
+    box-shadow: 0 0 10px #aaa;
+}
+
 .card-flipped .front {
-    transform:rotate3d(0,1,0,180deg);
+    transform: rotate3d(0, 1, 0, 180deg);
     z-index: 8;
 }
+
 .card-flipped .back {
-    transform:rotate3d(0,1,0,0deg);
+    transform: rotate3d(0, 1, 0, 0deg);
     z-index: 10;
+}
+
+.card-removed {
+    opacity: 0;
 }
 
 .cardAQ {
-    background: url("../../static/images/poker/12.jpg");
+    background-position: -1174px -15px;
 }
 
 .cardAK {
-    background: url("../../static/images/poker/13.jpg");
+    background-position: -1283px -15px;
+}
+
+.cardBQ {
+    background-position: -1174px -168px;
+}
+
+.cardBK {
+    background-position: -1283px -168px;
+}
+
+.cardCQ {
+    background-position: -1174px -320px;
+}
+
+.cardCK {
+    background-position: -1283px -320px;
+}
+
+.cardDQ {
+    background-position: -1174px -471px;
+}
+
+.cardDK {
+    background-position: -1283px -471px;
 }
