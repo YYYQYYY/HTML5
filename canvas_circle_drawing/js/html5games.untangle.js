@@ -79,6 +79,7 @@ function setupCurrentLevel() {
     }
     connectCircles();
     updateLineIntersection();
+    updateLevelProgress();
 }
 
 function Circle(x, y, radius) {
