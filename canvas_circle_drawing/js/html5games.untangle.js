@@ -161,7 +161,11 @@ function drawLine(ctx, x1, y1, x2, y2, thickness) {
 }
 
 function drawCircle(ctx, x, y, radius) {
-    ctx.fillStyle = "rgba(200,200,100,.9)";
+    var circle_gradient = ctx.createRadialGradient(x - 3, y - 3, 1, x, y, radius);
+    circle_gradient.addColorStop(0,"#fff");
+    circle_gradient.addColorStop(1,"#cc0");
+    ctx.fillStyle = circle_gradient;
+
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, Math.PI * 2, true);
     ctx.closePath();
@@ -182,7 +186,13 @@ function connectCircles() {
 }
 
 function clear(ctx, canvas) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    var bg_gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
+    bg_gradient.addColorStop(0, "#000000");
+    bg_gradient.addColorStop(1, "#555555");
+    ctx.fillStyle = bg_gradient;
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
 $(function () {
