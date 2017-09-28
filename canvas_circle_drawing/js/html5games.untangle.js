@@ -6,7 +6,8 @@ var untangleGame = {
     thinLineThickness: 1,
     boldLineThickness: 5,
     lines: [],
-    currentLevel: 0
+    currentLevel: 0,
+    progressPercentage: 0
 };
 
 untangleGame.levels = [
@@ -146,8 +147,8 @@ function updateLevelProgress() {
             progress++;
         }
     }
-    var progressPercentage = Math.floor(progress / untangleGame.lines.length * 100);
-    $("#progress").html(progressPercentage);
+   untangleGame.progressPercentage = Math.floor(progress / untangleGame.lines.length * 100);
+    $("#progress").html(untangleGame.progressPercentage);
     $("#level").html(untangleGame.currentLevel);
 }
 
@@ -162,8 +163,8 @@ function drawLine(ctx, x1, y1, x2, y2, thickness) {
 
 function drawCircle(ctx, x, y, radius) {
     var circle_gradient = ctx.createRadialGradient(x - 3, y - 3, 1, x, y, radius);
-    circle_gradient.addColorStop(0,"#fff");
-    circle_gradient.addColorStop(1,"#cc0");
+    circle_gradient.addColorStop(0, "#fff");
+    circle_gradient.addColorStop(1, "#cc0");
     ctx.fillStyle = circle_gradient;
 
     ctx.beginPath();
@@ -193,62 +194,41 @@ function clear(ctx, canvas) {
     bg_gradient.addColorStop(1, "#555555");
     ctx.fillStyle = bg_gradient;
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    ctx.drawImage(untangleGame.background, 0, 0);
+
+    ctx.font = "26px Arial";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText("Untangle Game", ctx.canvas.width / 2, 50);
+
+    ctx.textAlign = "left";
+    ctx.textBaseline = "bottom";
+    ctx.fillText("Puzzle " + untangleGame.currentLevel + ", Completeness:" + untangleGame.progressPercentage + "%", 20, ctx.canvas.height - 5);
+}
+
+function gameLoop() {
+    var canvas = document.getElementById("game");
+    var ctx = canvas.getContext("2d");
+
+    clear(ctx, canvas);
+
+    for (var li = 0; li < untangleGame.lines.length; li++) {
+        var line = untangleGame.lines[li];
+        var startPoint = line.startPoint;
+        var endPoint = line.endPoint;
+        var thickness = line.thickness;
+        drawLine(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y, thickness);
+    }
+    for (var ci = 0; ci < untangleGame.circles.length; ci++) {
+        var circle = untangleGame.circles[ci];
+        drawCircle(ctx, circle.x, circle.y, circle.radius);
+    }
 }
 
 $(function () {
     //var canvas = document.getElementById("game");
     //var ctx = canvas.getContext("2d");
-
-    //ctx.fillStyle = "rgba(200,200,100,.6)";
-    //ctx.beginPath();
-    //ctx.arc(100, 100, 50, 0, Math.PI * 2, true);
-    //ctx.closePath();
-    //ctx.fill();
-    //ctx.beginPath();
-    //ctx.arc(100, 110, 50, 0, Math.PI);
-    //ctx.closePath();
-    //ctx.fill();
-    //
-    //ctx.beginPath();
-    //ctx.arc(100, 90, 50, 0, Math.PI, true);
-    //ctx.closePath();
-    //ctx.fill();
-    //
-    //ctx.beginPath();
-    //ctx.arc(230, 100, 50, Math.PI / 2, Math.PI * 3 / 2);
-    //ctx.closePath();
-    //ctx.fill();
-    //
-    //ctx.beginPath();
-    //ctx.arc(250, 100, 50, Math.PI * 3 / 2, Math.PI / 2);
-    //ctx.closePath();
-    //ctx.fill();
-    //
-    //ctx.beginPath();
-    //ctx.arc(180, 240, 50, Math.PI * 7 / 6, Math.PI * 2 / 3);
-    //ctx.closePath();
-    //ctx.fill();
-    //
-    //ctx.beginPath();
-    //ctx.arc(150, 250, 50, Math.PI * 7 / 6, Math.PI * 2 / 3, true);
-    //ctx.closePath();
-    //ctx.fill();
-    //
-    //ctx.beginPath();
-    //ctx.arc(300, 250, 50, Math.PI * 3 / 2, 0, true);
-    //ctx.closePath();
-    //ctx.fill();
-    //var circleRadius = 10;//Math.random() * 10 + 1;
-    //var width = canvas.width;
-    //var height = canvas.height;
-    //var circlesCount = 5;
-    //for (var ci = 0; ci < circlesCount; ci++) {
-    //    var x = Math.random() * width;
-    //    var y = Math.random() * height;
-    //    drawCircle(ctx, x, y, circleRadius);
-    //    untangleGame.circles.push(new Circle(x, y, circleRadius));
-    //}
-    //connectCircles();
 
     $("#game").mousedown(function (e) {
         var canvasPosition = $(this).offset();
@@ -286,24 +266,12 @@ $(function () {
 
     setupCurrentLevel();
 
-    setInterval(gameLoop, 30);
+    untangleGame.background = new Image();
+    untangleGame.background.onload = function () {
+        setInterval(gameLoop, 30);
+    };
+    untangleGame.background.onerror = function () {
+        console.log("Error loading the image.");
+    };
+    untangleGame.background.src = "images/board.png";
 });
-
-function gameLoop() {
-    var canvas = document.getElementById("game");
-    var ctx = canvas.getContext("2d");
-
-    clear(ctx, canvas);
-
-    for (var li = 0; li < untangleGame.lines.length; li++) {
-        var line = untangleGame.lines[li];
-        var startPoint = line.startPoint;
-        var endPoint = line.endPoint;
-        var thickness = line.thickness;
-        drawLine(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y, thickness);
-    }
-    for (var ci = 0; ci < untangleGame.circles.length; ci++) {
-        var circle = untangleGame.circles[ci];
-        drawCircle(ctx, circle.x, circle.y, circle.radius);
-    }
-}
