@@ -10,6 +10,8 @@ var untangleGame = {
     progressPercentage: 0
 };
 
+untangleGame.layers = new Array();
+
 untangleGame.levels = [
     {
         "level": 0,
@@ -148,9 +150,22 @@ function updateLevelProgress() {
             progress++;
         }
     }
-   untangleGame.progressPercentage = Math.floor(progress / untangleGame.lines.length * 100);
+    untangleGame.progressPercentage = Math.floor(progress / untangleGame.lines.length * 100);
     $("#progress").html(untangleGame.progressPercentage);
     $("#level").html(untangleGame.currentLevel);
+}
+
+function connectCircles() {
+    var level = untangleGame.levels[untangleGame.currentLevel];
+    untangleGame.lines.length = 0;
+    for (var li in level.relationship) {
+        var connectedPoints = level.relationship[li].connectedPoints;
+        var startPoint = untangleGame.circles[li];
+        for (var lj in connectedPoints) {
+            var endPoint = untangleGame.circles[lj];
+            untangleGame.lines.push(new Line(startPoint, endPoint, untangleGame.thinLineThickness));
+        }
+    }
 }
 
 function drawLine(ctx, x1, y1, x2, y2, thickness) {
@@ -174,45 +189,39 @@ function drawCircle(ctx, x, y, radius) {
     ctx.fill();
 }
 
-function connectCircles() {
-    var level = untangleGame.levels[untangleGame.currentLevel];
-    untangleGame.lines.length = 0;
-    for (var li in level.relationship) {
-        var connectedPoints = level.relationship[li].connectedPoints;
-        var startPoint = untangleGame.circles[li];
-        for (var lj in connectedPoints) {
-            var endPoint = untangleGame.circles[lj];
-            untangleGame.lines.push(new Line(startPoint, endPoint, untangleGame.thinLineThickness));
-        }
+function clear(ctx) {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    //var bg_gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
+    //bg_gradient.addColorStop(0, "#000000");
+    //bg_gradient.addColorStop(1, "#555555");
+    //ctx.fillStyle = bg_gradient;
+    //ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+}
+
+function drawLayerBG() {
+    var ctx = untangleGame.layers[0];
+    clear(ctx);
+
+    ctx.drawImage(untangleGame.background, 0, 0);
+}
+
+function drawLayerGuide() {
+    var ctx = untangleGame.layers[1];
+    clear(ctx);
+
+    if (untangleGame.guideReady) {
+        var nextFrameX = untangleGame.guideFrame * 80;
+        ctx.drawImage(untangleGame.guide.nextFrameX, 0, 80, 130, 325, 130, 80, 130);
+    }
+    if (untangleGame.currentLevel == 1) {
+        $("#guide").addClass("fadeout");
     }
 }
 
-function clear(ctx, canvas) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    var bg_gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
-    bg_gradient.addColorStop(0, "#000000");
-    bg_gradient.addColorStop(1, "#555555");
-    ctx.fillStyle = bg_gradient;
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-    ctx.drawImage(untangleGame.background, 0, 0);
-
-    ctx.font = "26px Arial";
-    ctx.textAlign = "center";
-    ctx.fillStyle = "#ffffff";
-    ctx.fillText("Untangle Game", ctx.canvas.width / 2, 50);
-
-    ctx.textAlign = "left";
-    ctx.textBaseline = "bottom";
-    ctx.fillText("Puzzle " + untangleGame.currentLevel + ", Completeness:" + untangleGame.progressPercentage + "%", 20, ctx.canvas.height - 5);
-}
-
-function gameLoop() {
-    var canvas = document.getElementById("game");
-    var ctx = canvas.getContext("2d");
-
-    clear(ctx, canvas);
+function drawLayerGame() {
+    var ctx = untangleGame.layers[2];
+    clear(ctx);
 
     for (var li = 0; li < untangleGame.lines.length; li++) {
         var line = untangleGame.lines[li];
@@ -227,11 +236,49 @@ function gameLoop() {
     }
 }
 
-$(function () {
-    //var canvas = document.getElementById("game");
-    //var ctx = canvas.getContext("2d");
+function drawLayerUI() {
+    var ctx = untangleGame.layers[3];
+    clear(ctx);
 
-    $("#game").mousedown(function (e) {
+    ctx.font = "26px Arial";
+    ctx.fillStyle = "#dddddd";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "bottom";
+    ctx.fillText("Puzzle " + untangleGame.currentLevel + ", Completeness:", 60, ctx.canvas.height - 80);
+    ctx.fillText(untangleGame.progressPercentage + "%", 450, ctx.canvas.height - 80);
+
+    var isOverlappedWithCircle = false;
+    for (var i in untangleGame.circles) {
+        var point = untangleGame.circles[i];
+        if (point.y > 310) {
+            isOverlappedWithCircle = true;
+        }
+    }
+    if (isOverlappedWithCircle) {
+        $("#ui").addClass("dim");
+    } else {
+        $("#ui").removeClass("dim");
+    }
+}
+
+function gameLoop() {
+    drawLayerGuide();
+    drawLayerGame();
+    drawLayerUI();
+}
+
+$(function () {
+    var canvas_bg = document.getElementById("bg");
+    untangleGame.layers[0] = canvas_bg.getContext("2d");
+    var canvas_guide = document.getElementById("guide");
+    untangleGame.layers[1] = canvas_guide.getContext("2d");
+    var canvas_game = document.getElementById("game");
+    untangleGame.layers[2] = canvas_game.getContext("2d");
+    var canvas_ui = document.getElementById("ui");
+    untangleGame.layers[3] = canvas_ui.getContext("2d");
+
+    var layers = $("#layers");
+    layers.mousedown(function (e) {
         var canvasPosition = $(this).offset();
         var mouseX = (e.pageX - canvasPosition.left) || 0;
         var mouseY = (e.pageY - canvasPosition.top) || 0;
@@ -246,7 +293,7 @@ $(function () {
         }
     });
 
-    $("#game").mousemove(function (e) {
+    layers.mousemove(function (e) {
         if (untangleGame.targetCircle != undefined) {
             var canvasPosition = $(this).offset();
             var mouseX = (e.pageX - canvasPosition.left) || 0;
@@ -259,7 +306,7 @@ $(function () {
         updateLevelProgress();
     });
 
-    $("#game").mouseup(function (e) {
+    layers.mouseup(function (e) {
         untangleGame.targetCircle = undefined;
 
         checkLevelCompleteness();
@@ -269,6 +316,7 @@ $(function () {
 
     untangleGame.background = new Image();
     untangleGame.background.onload = function () {
+        drawLayerBG();
         setInterval(gameLoop, 30);
     };
     untangleGame.background.onerror = function () {
