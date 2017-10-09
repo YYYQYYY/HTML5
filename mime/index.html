@@ -290,9 +290,9 @@
             var x = i % c * 30;
             var y = (Math.floor(i / c) + 1) * 30;
             if (minedata[Math.floor(i / c)][i % c] == 9) {
-                ctx.fillText("×", x, y);
+                ctx.fillText("B", x, y);
             } else if (minedata[Math.floor(i / c)][i % c] == 0) {
-                ctx.fillText("0", x, y);
+                ctx.fillText("", x, y);
             } else {
                 ctx.fillText(minedata[Math.floor(i / c)][i % c].toString(), x, y);
             }
